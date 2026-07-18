@@ -6,7 +6,7 @@ config FLB36_STATUS_SCREEN
       Show both split-peripheral battery levels and the active host profile.
 
 config FLB36_I2C_TEST
-    bool "FLB36 OLED I2C diagnostic"
+    bool "FLB36 raw OLED diagnostic"
     default n
     help
-      Report OLED address detection using the software-controlled onboard LED.
+      Write a checkerboard directly to SSD1306 display RAM.
