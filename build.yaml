@@ -19,20 +19,20 @@
 #
 ---
 include:
-  - board: nice_nano_v2
+  - board: nice_nano/nrf52840
     shield: flb36_left
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
     artifact-name: flb36_left
-  - board: nice_nano_v2
+  - board: nice_nano/nrf52840
     shield: flb36_right
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
     artifact-name: flb36_right
-  - board: nice_nano
+  - board: nice_nano/nrf52840
     shield: flb36_dongle dongle_display
     artifact-name: flb36_dongle
-  - board: nice_nano_v2
+  - board: nice_nano/nrf52840
     shield: settings_reset
     artifact-name: settings_reset_keyboard
-  - board: nice_nano
+  - board: nice_nano/nrf52840
     shield: settings_reset
     artifact-name: settings_reset_dongle
