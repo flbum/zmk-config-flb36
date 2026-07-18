@@ -57,12 +57,21 @@ ZMK_SUBSCRIPTION(flb36_status, zmk_ble_active_profile_changed);
 lv_obj_t *zmk_display_status_screen(void) {
     lv_obj_t *screen = lv_obj_create(NULL);
 
+    lv_obj_set_style_bg_color(screen, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_width(screen, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(screen, 0, LV_PART_MAIN);
+    lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
+
     battery_label = lv_label_create(screen);
+    lv_obj_set_style_text_color(battery_label, lv_color_white(), LV_PART_MAIN);
     lv_obj_align(battery_label, LV_ALIGN_TOP_MID, 0, 0);
 
     profile_label = lv_label_create(screen);
+    lv_obj_set_style_text_color(profile_label, lv_color_white(), LV_PART_MAIN);
     lv_obj_align(profile_label, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     flb36_status_init();
+    lv_obj_invalidate(screen);
     return screen;
 }
