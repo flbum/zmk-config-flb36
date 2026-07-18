@@ -13,6 +13,14 @@
     status = "disabled";
 };
 
+/*
+ * This SuperMini/ProMicro nRF52840 clone uses nice!nano v2 VCC
+ * control polarity even though its bootloader reports nice!nano v1.
+ */
+&{/EXT_POWER} {
+    control-gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
+};
+
 &pinctrl {
     flb36_i2c0_default: flb36_i2c0_default {
         group1 {
