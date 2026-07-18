@@ -1,0 +1,3 @@
+zephyr_library()
+zephyr_library_sources_ifdef(CONFIG_FLB36_STATUS_SCREEN src/flb36_status_screen.c)
+zephyr_library_sources_ifdef(CONFIG_FLB36_CONNECTION_LED src/flb36_connection_led.c)

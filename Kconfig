@@ -1,0 +1,13 @@
+config FLB36_STATUS_SCREEN
+    bool "FLB36 dongle status screen"
+    depends on ZMK_DISPLAY
+    default n
+    help
+      Show both split-peripheral battery levels and the active host profile.
+
+config FLB36_CONNECTION_LED
+    bool "FLB36 dongle connection LED"
+    depends on ZMK_SPLIT_ROLE_CENTRAL
+    default n
+    help
+      Keep the onboard blue LED solid while both keyboard halves are connected.
