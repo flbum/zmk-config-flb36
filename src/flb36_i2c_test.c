@@ -10,7 +10,7 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 
-static const struct device *const i2c_bus = DEVICE_DT_GET(DT_NODELABEL(oled_i2c));
+static const struct device *const i2c_bus = DEVICE_DT_GET(DT_NODELABEL(i2c0));
 static struct k_work_delayable test_work;
 
 static bool turn_display_off(uint16_t address) {

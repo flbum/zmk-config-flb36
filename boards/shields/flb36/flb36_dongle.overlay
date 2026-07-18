@@ -22,8 +22,46 @@
     init-delay-ms = <1000>;
 };
 
+&pinctrl {
+    flb36_i2c0_default: flb36_i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 24)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 22)>;
+        };
+    };
+
+    flb36_i2c0_sleep: flb36_i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 24)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 22)>;
+            low-power-enable;
+        };
+    };
+};
+
 &i2c0 {
-    status = "disabled";
+    compatible = "nordic,nrf-twim";
+    status = "okay";
+    pinctrl-0 = <&flb36_i2c0_default>;
+    pinctrl-1 = <&flb36_i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    oled: ssd1306@3c {
+        compatible = "solomon,ssd1306fb";
+        reg = <0x3c>;
+        width = <128>;
+        height = <32>;
+        segment-offset = <0>;
+        page-offset = <0>;
+        display-offset = <0>;
+        multiplex-ratio = <31>;
+        segment-remap;
+        com-invdir;
+        com-sequential;
+        prechargep = <0x22>;
+        ready-time-ms = <1000>;
+    };
 };
 
 / {
@@ -31,32 +69,6 @@
         zmk,kscan = &dongle_kscan;
         zmk,physical-layout = &flb36_layout;
         zephyr,display = &oled;
-    };
-
-    oled_i2c: oled_i2c {
-        compatible = "gpio-i2c";
-        status = "okay";
-        clock-frequency = <I2C_BITRATE_STANDARD>;
-        scl-gpios = <&gpio0 22 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-        sda-gpios = <&gpio0 24 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-        #address-cells = <1>;
-        #size-cells = <0>;
-
-        oled: ssd1306@3c {
-            compatible = "solomon,ssd1306fb";
-            reg = <0x3c>;
-            width = <128>;
-            height = <32>;
-            segment-offset = <0>;
-            page-offset = <0>;
-            display-offset = <0>;
-            multiplex-ratio = <31>;
-            segment-remap;
-            com-invdir;
-            com-sequential;
-            prechargep = <0x22>;
-            ready-time-ms = <1000>;
-        };
     };
 
     default_transform: default_transform {
