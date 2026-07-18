@@ -24,6 +24,7 @@ struct flb36_status_state {
 
 static lv_obj_t *battery_label;
 static lv_obj_t *profile_label;
+static lv_style_t screen_style;
 
 static struct flb36_status_state get_status(const zmk_event_t *eh) {
     struct flb36_status_state state = {
@@ -57,18 +58,20 @@ ZMK_SUBSCRIPTION(flb36_status, zmk_ble_active_profile_changed);
 lv_obj_t *zmk_display_status_screen(void) {
     lv_obj_t *screen = lv_obj_create(NULL);
 
-    lv_obj_set_style_bg_color(screen, lv_color_black(), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
-    lv_obj_set_style_border_width(screen, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(screen, 0, LV_PART_MAIN);
+    lv_style_init(&screen_style);
+    lv_style_set_bg_color(&screen_style, lv_color_white());
+    lv_style_set_bg_opa(&screen_style, LV_OPA_COVER);
+    lv_style_set_text_color(&screen_style, lv_color_black());
+    lv_style_set_text_font(&screen_style, &lv_font_unscii_8);
+    lv_style_set_border_width(&screen_style, 0);
+    lv_style_set_pad_all(&screen_style, 0);
+    lv_obj_add_style(screen, &screen_style, LV_PART_MAIN);
     lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
 
     battery_label = lv_label_create(screen);
-    lv_obj_set_style_text_color(battery_label, lv_color_white(), LV_PART_MAIN);
     lv_obj_align(battery_label, LV_ALIGN_TOP_MID, 0, 0);
 
     profile_label = lv_label_create(screen);
-    lv_obj_set_style_text_color(profile_label, lv_color_white(), LV_PART_MAIN);
     lv_obj_align(profile_label, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     flb36_status_init();
