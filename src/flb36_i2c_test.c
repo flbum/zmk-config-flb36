@@ -10,6 +10,9 @@
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(flb36_i2c_test, LOG_LEVEL_INF);
 
 enum test_result {
     TEST_WAITING,
@@ -36,17 +39,29 @@ static void test_handler(struct k_work *work) {
         if (address_responds(0x3c)) {
             result = TEST_ADDRESS_3C;
             gpio_pin_set_dt(&status_led, 1);
-            return;
+        } else {
+            result = address_responds(0x3d) ? TEST_ADDRESS_3D : TEST_NO_DEVICE;
         }
-
-        result = address_responds(0x3d) ? TEST_ADDRESS_3D : TEST_NO_DEVICE;
     }
 
-    led_on = !led_on;
-    gpio_pin_set_dt(&status_led, led_on);
+    switch (result) {
+    case TEST_ADDRESS_3C:
+        LOG_INF("OLED detected at I2C address 0x3C");
+        gpio_pin_set_dt(&status_led, 1);
+        break;
+    case TEST_ADDRESS_3D:
+        LOG_INF("OLED detected at I2C address 0x3D");
+        led_on = !led_on;
+        gpio_pin_set_dt(&status_led, led_on);
+        break;
+    default:
+        LOG_ERR("No OLED detected at I2C address 0x3C or 0x3D");
+        led_on = !led_on;
+        gpio_pin_set_dt(&status_led, led_on);
+        break;
+    }
 
-    k_work_reschedule(&test_work,
-                      result == TEST_ADDRESS_3D ? K_MSEC(750) : K_MSEC(125));
+    k_work_reschedule(&test_work, K_SECONDS(2));
 }
 
 static int flb36_i2c_test_init(void) {

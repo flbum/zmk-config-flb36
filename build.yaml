@@ -32,6 +32,7 @@ include:
     artifact-name: flb36_dongle
   - board: nice_nano
     shield: flb36_dongle
+    snippet: zmk-usb-logging
     cmake-args: -DCONFIG_FLB36_I2C_TEST=y
     artifact-name: flb36_dongle_i2c_test
   - board: nice_nano_v2
