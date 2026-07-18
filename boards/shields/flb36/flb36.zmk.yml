@@ -1,0 +1,16 @@
+file_format: "1"
+id: flb36
+name: FLB36
+type: shield
+features:
+  - keys
+  - encoder
+  - underglow
+
+requires:
+  - pro_micro
+
+siblings:
+  - flb36_left
+  - flb36_right
+  - flb36_dongle
