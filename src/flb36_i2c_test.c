@@ -6,72 +6,29 @@
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
-#include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
-
-LOG_MODULE_REGISTER(flb36_i2c_test, LOG_LEVEL_INF);
-
-enum test_result {
-    TEST_WAITING,
-    TEST_ADDRESS_3C,
-    TEST_ADDRESS_3D,
-    TEST_NO_DEVICE,
-};
 
 static const struct device *const i2c_bus = DEVICE_DT_GET(DT_NODELABEL(i2c0));
-static const struct gpio_dt_spec status_led =
-    GPIO_DT_SPEC_GET(DT_NODELABEL(blue_led), gpios);
-
-static enum test_result result = TEST_WAITING;
-static bool led_on;
 static struct k_work_delayable test_work;
 
-static bool address_responds(uint16_t address) {
-    const uint8_t control_byte = 0x00;
-    return i2c_write(i2c_bus, &control_byte, sizeof(control_byte), address) == 0;
+static bool turn_display_off(uint16_t address) {
+    const uint8_t display_off = 0xae;
+    return i2c_burst_write(i2c_bus, address, 0x00, &display_off, sizeof(display_off)) == 0;
 }
 
 static void test_handler(struct k_work *work) {
-    if (result == TEST_WAITING) {
-        if (address_responds(0x3c)) {
-            result = TEST_ADDRESS_3C;
-            gpio_pin_set_dt(&status_led, 1);
-        } else {
-            result = address_responds(0x3d) ? TEST_ADDRESS_3D : TEST_NO_DEVICE;
-        }
+    if (!turn_display_off(0x3c)) {
+        turn_display_off(0x3d);
     }
 
-    switch (result) {
-    case TEST_ADDRESS_3C:
-        LOG_INF("OLED detected at I2C address 0x3C");
-        gpio_pin_set_dt(&status_led, 1);
-        break;
-    case TEST_ADDRESS_3D:
-        LOG_INF("OLED detected at I2C address 0x3D");
-        led_on = !led_on;
-        gpio_pin_set_dt(&status_led, led_on);
-        break;
-    default:
-        LOG_ERR("No OLED detected at I2C address 0x3C or 0x3D");
-        led_on = !led_on;
-        gpio_pin_set_dt(&status_led, led_on);
-        break;
-    }
-
-    k_work_reschedule(&test_work, K_SECONDS(2));
+    k_work_reschedule(&test_work, K_SECONDS(1));
 }
 
 static int flb36_i2c_test_init(void) {
-    if (!device_is_ready(i2c_bus) || !gpio_is_ready_dt(&status_led)) {
+    if (!device_is_ready(i2c_bus)) {
         return -ENODEV;
-    }
-
-    int err = gpio_pin_configure_dt(&status_led, GPIO_OUTPUT_INACTIVE);
-    if (err) {
-        return err;
     }
 
     k_work_init_delayable(&test_work, test_handler);
