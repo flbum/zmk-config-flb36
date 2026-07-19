@@ -38,6 +38,8 @@ include:
       -DCONFIG_DISPLAY=n
       -DCONFIG_SSD1306=n
       -DCONFIG_LVGL=n
+      -DCONFIG_I2C=y
+      -DCONFIG_I2C_NRFX=y
     artifact-name: flb36_oled_raw_test
   - board: nice_nano/nrf52840/zmk
     shield: settings_reset
