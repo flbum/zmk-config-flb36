@@ -42,9 +42,12 @@ static const uint8_t font[][5] = {
     ['9' - ' '] = {0x06, 0x49, 0x49, 0x29, 0x1e},
     [':' - ' '] = {0x00, 0x36, 0x36, 0x00, 0x00},
     ['B' - ' '] = {0x7f, 0x49, 0x49, 0x49, 0x36},
+    ['E' - ' '] = {0x7f, 0x49, 0x49, 0x49, 0x41},
     ['L' - ' '] = {0x7f, 0x40, 0x40, 0x40, 0x40},
+    ['O' - ' '] = {0x3e, 0x41, 0x41, 0x41, 0x3e},
     ['R' - ' '] = {0x7f, 0x09, 0x19, 0x29, 0x46},
     ['T' - ' '] = {0x01, 0x01, 0x7f, 0x01, 0x01},
+    ['Y' - ' '] = {0x03, 0x04, 0x78, 0x04, 0x03},
 };
 
 static int command(uint8_t value) {
@@ -88,6 +91,30 @@ static void draw_text_2x(uint8_t x, const char *text) {
             }
         }
         x += 12;
+    }
+}
+
+static void draw_text_3x(uint8_t x, uint8_t y, const char *text) {
+    while (*text && x + 15 < OLED_WIDTH) {
+        char c = *text++;
+        if (c >= ' ' && c <= 'Y') {
+            const uint8_t *glyph = font[c - ' '];
+            for (uint8_t column = 0; column < 5; column++) {
+                for (uint8_t row = 0; row < 7; row++) {
+                    if (!(glyph[column] & BIT(row))) {
+                        continue;
+                    }
+                    for (uint8_t dx = 0; dx < 3; dx++) {
+                        for (uint8_t dy = 0; dy < 3; dy++) {
+                            uint8_t px = x + column * 3 + dx;
+                            uint8_t py = y + row * 3 + dy;
+                            framebuffer[(py / 8) * OLED_WIDTH + px] |= BIT(py % 8);
+                        }
+                    }
+                }
+            }
+        }
+        x += 18;
     }
 }
 
@@ -146,6 +173,11 @@ static int status_screen_init(void) {
             return -EIO;
         }
     }
+    memset(framebuffer, 0, sizeof(framebuffer));
+    draw_text_3x(19, 5, "LEROY");
+    flush();
+    command(0xaf);
+    k_msleep(3000);
     k_work_init_delayable(&refresh_work, refresh);
     k_work_schedule(&refresh_work, K_NO_WAIT);
     return 0;

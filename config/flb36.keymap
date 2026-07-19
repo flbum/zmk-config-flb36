@@ -116,7 +116,7 @@
     &kp Q           &kp W           &kp E           &kp R           &kp T           &kp Y           &kp U           &kp I           &kp O           &kp P
     &kp A           &kp S           &kp D           &kp F           &kp G           &kp H           &kp J           &kp K           &kp L           &kp SEMI
     &mt LSHFT Z     &mt LALT X      &mt LCTRL C     &mt LGUI V      &kp B           &kp N           &mt RGUI M      &mt RCTRL COMMA &mt RALT DOT     &mt RSHFT FSLH
-    &kp LALT        &mt LGUI TAB    &lt 1 SPACE     &tog 2          &kp C_MUTE      &lt 2 SPACE     &mt LCTRL BSPC  &mt RSHFT RET
+    &kp LALT        &mt LGUI TAB    &lt 1 SPACE     &tog 2          &kp C_MUTE      &lt 2 SPACE     &kp BSPC        &mt RSHFT RET
             >;
 
             /* Left: Tab / Shift+Tab (swap order if direction feels reversed). Right: volume. */
