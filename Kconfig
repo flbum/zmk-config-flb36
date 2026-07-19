@@ -1,9 +1,8 @@
 config FLB36_STATUS_SCREEN
-    bool "FLB36 dongle status screen"
-    depends on ZMK_DISPLAY
+    bool "FLB36 raw-I2C dongle status screen"
     default n
     help
-      Show both split-peripheral battery levels and the active host profile.
+      Show both peripheral battery levels and the active host profile.
 
 config FLB36_I2C_TEST
     bool "FLB36 raw OLED diagnostic"
