@@ -1,0 +1,5 @@
+description: FLB36 global underglow proxy
+
+compatible: "flb36,behavior-rgb-proxy"
+
+include: two_param.yaml

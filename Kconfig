@@ -11,6 +11,12 @@ config FLB36_CHARGE_STATUS
     help
       Include USB-power state in the battery value sent to the dongle.
 
+config FLB36_RGB_PROXY
+    bool "FLB36 split underglow proxy"
+    default n
+    help
+      Expose underglow controls to Studio on the dongle and forward them to both halves.
+
 config FLB36_I2C_TEST
     bool "FLB36 raw OLED diagnostic"
     default n

@@ -6,6 +6,10 @@ if(CONFIG_FLB36_CHARGE_STATUS)
   target_sources(app PRIVATE src/flb36_charge_status.c)
 endif()
 
+if(CONFIG_FLB36_RGB_PROXY)
+  target_sources(app PRIVATE src/flb36_rgb_proxy.c)
+endif()
+
 if(CONFIG_FLB36_I2C_TEST)
   target_sources(app PRIVATE src/flb36_i2c_test.c)
 endif()
