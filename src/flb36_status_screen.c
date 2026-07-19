@@ -93,15 +93,15 @@ static void refresh(struct k_work *work) {
     zmk_split_central_get_peripheral_battery_level(1, &right);
     memset(framebuffer, 0, sizeof(framebuffer));
 
-    snprintf(line, sizeof(line), "L: %u%%", left);
-    draw_text(0, 0, line);
-    snprintf(line, sizeof(line), "R: %u%%", right);
+    snprintf(line, sizeof(line), "L:%u%%", left);
     draw_text(0, 1, line);
+    snprintf(line, sizeof(line), "R:%u%%", right);
+    draw_text(128 - (strlen(line) * 6), 1, line);
     snprintf(line, sizeof(line), "BT: %u", zmk_ble_active_profile_index() + 1);
-    draw_text(0, 3, line);
+    draw_text((128 - (strlen(line) * 6)) / 2, 3, line);
     flush();
     command(0xaf);
-    k_work_reschedule(&refresh_work, K_SECONDS(5));
+    k_work_reschedule(&refresh_work, K_SECONDS(1));
 }
 
 static int status_screen_init(void) {
