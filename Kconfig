@@ -17,6 +17,13 @@ config FLB36_RGB_PROXY
     help
       Expose underglow controls to Studio on the dongle and forward them to both halves.
 
+config FLB36_SUNRISE
+    bool "FLB36 startup sunrise"
+    default n
+    depends on ZMK_RGB_UNDERGLOW
+    help
+      Run a warm sunrise animation at startup and restore underglow after activity.
+
 config FLB36_I2C_TEST
     bool "FLB36 raw OLED diagnostic"
     default n

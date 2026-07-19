@@ -40,7 +40,7 @@
 
 / {
     behaviors {
-        rgb_px: peripheral_underglow {
+        rgb_px: rgb_px {
             compatible = "flb36,behavior-rgb-proxy";
             #binding-cells = <2>;
             display-name = "Peripheral Underglow";
