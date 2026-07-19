@@ -33,6 +33,7 @@
 };
 
 &lt {
+    flavor = "hold-preferred";
     tapping-term-ms = <170>;
     quick-tap-ms = <150>;
 };

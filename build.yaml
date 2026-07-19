@@ -29,6 +29,8 @@ include:
     artifact-name: flb36_right
   - board: nice_nano/nrf52840/zmk
     shield: flb36_dongle
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y
     artifact-name: flb36_dongle
   - board: nice_nano/nrf52840/zmk
     shield: settings_reset

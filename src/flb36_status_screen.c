@@ -24,11 +24,15 @@
 static const struct device *const i2c_bus = DEVICE_DT_GET(DT_NODELABEL(i2c0));
 static struct k_work_delayable refresh_work;
 static uint8_t framebuffer[OLED_WIDTH * OLED_PAGES];
+static uint8_t left_display = UINT8_MAX;
+static uint8_t right_display = UINT8_MAX;
+static uint8_t left_power_samples;
+static uint8_t right_power_samples;
 
 static const uint8_t font[][5] = {
     [' ' - ' '] = {0, 0, 0, 0, 0},
     ['%' - ' '] = {0x62, 0x64, 0x08, 0x13, 0x23},
-    ['+' - ' '] = {0x08, 0x08, 0x3e, 0x08, 0x08},
+    ['+' - ' '] = {0x10, 0x38, 0x0e, 0x07, 0x02},
     ['-' - ' '] = {0x08, 0x08, 0x08, 0x08, 0x08},
     ['0' - ' '] = {0x3e, 0x51, 0x49, 0x45, 0x3e},
     ['1' - ' '] = {0x00, 0x42, 0x7f, 0x40, 0x00},
@@ -135,18 +139,39 @@ static int flush(void) {
     return 0;
 }
 
+static uint8_t stable_level(uint8_t level, uint8_t *displayed) {
+    if (*displayed == UINT8_MAX || level >= *displayed + 4 || level + 4 <= *displayed) {
+        *displayed = level;
+    }
+    return *displayed;
+}
+
+static bool stable_powered(uint8_t raw, uint8_t *samples) {
+    if (raw & 1) {
+        if (*samples < 3) {
+            (*samples)++;
+        }
+    } else if (*samples > 0) {
+        (*samples)--;
+    }
+    return *samples >= 2;
+}
+
 static void refresh(struct k_work *work) {
     uint8_t left_raw = 0, right_raw = 0;
     uint8_t left, right;
     bool left_powered, right_powered;
     char line[20];
 
-    zmk_split_central_get_peripheral_battery_level(0, &left_raw);
-    zmk_split_central_get_peripheral_battery_level(1, &right_raw);
-    left_powered = left_raw & 1;
-    right_powered = right_raw & 1;
-    left = left_powered && left_raw == 99 ? 100 : left_raw & 0xfe;
-    right = right_powered && right_raw == 99 ? 100 : right_raw & 0xfe;
+    /* The saved peripheral slot order is right, then left. */
+    zmk_split_central_get_peripheral_battery_level(1, &left_raw);
+    zmk_split_central_get_peripheral_battery_level(0, &right_raw);
+    left_powered = stable_powered(left_raw, &left_power_samples);
+    right_powered = stable_powered(right_raw, &right_power_samples);
+    left = left_powered ? (left_raw == 99 ? 100 : left_raw & 0xfe) : left_raw;
+    right = right_powered ? (right_raw == 99 ? 100 : right_raw & 0xfe) : right_raw;
+    left = stable_level(left, &left_display);
+    right = stable_level(right, &right_display);
     memset(framebuffer, 0, sizeof(framebuffer));
 
     snprintf(line, sizeof(line), "%u%%%s", left, left_powered ? "+" : "");
