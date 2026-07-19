@@ -32,7 +32,12 @@ include:
     artifact-name: flb36_dongle
   - board: nice_nano/nrf52840/zmk
     shield: flb36_dongle
-    cmake-args: -DCONFIG_FLB36_I2C_TEST=y
+    cmake-args: >-
+      -DCONFIG_FLB36_I2C_TEST=y
+      -DCONFIG_ZMK_DISPLAY=n
+      -DCONFIG_DISPLAY=n
+      -DCONFIG_SSD1306=n
+      -DCONFIG_LVGL=n
     artifact-name: flb36_oled_raw_test
   - board: nice_nano/nrf52840/zmk
     shield: settings_reset
