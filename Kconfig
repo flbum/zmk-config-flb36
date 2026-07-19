@@ -4,6 +4,13 @@ config FLB36_STATUS_SCREEN
     help
       Show both peripheral battery levels and the active host profile.
 
+config FLB36_CHARGE_STATUS
+    bool "FLB36 peripheral USB-power reporting"
+    default n
+    depends on BT_BAS
+    help
+      Include USB-power state in the battery value sent to the dongle.
+
 config FLB36_I2C_TEST
     bool "FLB36 raw OLED diagnostic"
     default n

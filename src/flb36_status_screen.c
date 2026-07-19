@@ -28,6 +28,7 @@ static uint8_t framebuffer[OLED_WIDTH * OLED_PAGES];
 static const uint8_t font[][5] = {
     [' ' - ' '] = {0, 0, 0, 0, 0},
     ['%' - ' '] = {0x62, 0x64, 0x08, 0x13, 0x23},
+    ['+' - ' '] = {0x08, 0x08, 0x3e, 0x08, 0x08},
     ['-' - ' '] = {0x08, 0x08, 0x08, 0x08, 0x08},
     ['0' - ' '] = {0x3e, 0x51, 0x49, 0x45, 0x3e},
     ['1' - ' '] = {0x00, 0x42, 0x7f, 0x40, 0x00},
@@ -68,6 +69,28 @@ static void draw_text(uint8_t x, uint8_t page, const char *text) {
     }
 }
 
+static void draw_text_2x(uint8_t x, const char *text) {
+    while (*text && x + 10 < OLED_WIDTH) {
+        char c = *text++;
+        if (c >= ' ' && c <= 'T') {
+            const uint8_t *glyph = font[c - ' '];
+            for (uint8_t column = 0; column < 5; column++) {
+                for (uint8_t row = 0; row < 7; row++) {
+                    if (glyph[column] & BIT(row)) {
+                        uint8_t px = x + column * 2;
+                        uint8_t py = row * 2;
+                        framebuffer[(py / 8) * OLED_WIDTH + px] |= BIT(py % 8);
+                        framebuffer[(py / 8) * OLED_WIDTH + px + 1] |= BIT(py % 8);
+                        framebuffer[((py + 1) / 8) * OLED_WIDTH + px] |= BIT((py + 1) % 8);
+                        framebuffer[((py + 1) / 8) * OLED_WIDTH + px + 1] |= BIT((py + 1) % 8);
+                    }
+                }
+            }
+        }
+        x += 12;
+    }
+}
+
 static int flush(void) {
     uint8_t packet[17];
     packet[0] = 0x40;
@@ -86,17 +109,23 @@ static int flush(void) {
 }
 
 static void refresh(struct k_work *work) {
-    uint8_t left = 0, right = 0;
+    uint8_t left_raw = 0, right_raw = 0;
+    uint8_t left, right;
+    bool left_powered, right_powered;
     char line[20];
 
-    zmk_split_central_get_peripheral_battery_level(0, &left);
-    zmk_split_central_get_peripheral_battery_level(1, &right);
+    zmk_split_central_get_peripheral_battery_level(0, &left_raw);
+    zmk_split_central_get_peripheral_battery_level(1, &right_raw);
+    left_powered = left_raw & 1;
+    right_powered = right_raw & 1;
+    left = left_powered && left_raw == 99 ? 100 : left_raw & 0xfe;
+    right = right_powered && right_raw == 99 ? 100 : right_raw & 0xfe;
     memset(framebuffer, 0, sizeof(framebuffer));
 
-    snprintf(line, sizeof(line), "L:%u%%", left);
-    draw_text(0, 1, line);
-    snprintf(line, sizeof(line), "R:%u%%", right);
-    draw_text(128 - (strlen(line) * 6), 1, line);
+    snprintf(line, sizeof(line), "%u%%%s", left, left_powered ? "+" : "");
+    draw_text_2x(0, line);
+    snprintf(line, sizeof(line), "%u%%%s", right, right_powered ? "+" : "");
+    draw_text_2x(128 - (strlen(line) * 12), line);
     snprintf(line, sizeof(line), "BT: %u", zmk_ble_active_profile_index() + 1);
     draw_text((128 - (strlen(line) * 6)) / 2, 3, line);
     flush();
